@@ -2,30 +2,38 @@ import Image from "next/image";
 import puppeteer from "puppeteer";
 
 const runPupp = async () => {
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
+  const browser = await puppeteer.launch({ headless: true });
+  const pages = await browser.pages();
+  const page = pages[0];
   await page.goto('https://btebresulthub.vercel.app/results');
-  await page.type("input[type=number]", "620340")
+  await page.type("input[type=number]", "620298")
   await page.click("button[type=submit]")
   await page.waitForSelector(".py-3.space-y-6")
   const resultItems = await page.evaluate(() => {
-    const FormListItem = Array.from(document.querySelectorAll(".py-3.space-y-6 div"))
-    FormListItem.map((item:any)=>{
-      console.log(item.querySelector("div").querySelectorAll("p")[0].innerText);
-      
-    })
+    const FormListItem = Array.from(document.querySelectorAll(".py-3.space-y-6 > div"))
+    const MainResultData = FormListItem.map((item: any, index: number) => ({
+      status: item.querySelectorAll("div")[0].querySelectorAll("p")[0].innerText,
+      semester: item.querySelectorAll("div")[0].querySelectorAll("p")[1].innerText,
+      date: item.querySelectorAll("div")[0].querySelectorAll("p")[2].innerText,
+      cgpa: item.querySelectorAll("div")[1].innerText,
+      passedSub: item.querySelectorAll("div")[1].querySelectorAll("span")[0].innerText !== "(Out of 4)" ? item.querySelectorAll("div")[1].querySelectorAll("span")[0].innerText : null,
+      wasRefardOn: item.querySelectorAll("div")[1].querySelectorAll("span")[0].innerText === '(Out of 4)' ? null : item.querySelectorAll("div")[1].querySelectorAll("span")[1].innerText,
+  
+      // span.px-1.rounded-full
+    }))
+    console.log(MainResultData);
 
-    return FormListItem
+    return MainResultData
   })
   // await page.screenshot({ path:  `public/screenshort/${Date.now()}.png` });
+  await browser.close();
   return resultItems
-  // await browser.close();
 }
 
 export default async function Home() {
-  // const data = await runPupp()
-  // console.log(data);
-  
+  const data = await runPupp()
+  console.log(data);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
