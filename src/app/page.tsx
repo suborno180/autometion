@@ -10,9 +10,10 @@ const runPupp = async () => {
   await page.waitForSelector(".py-3.space-y-6")
   const resultItems = await page.evaluate(() => {
     const FormListItem = Array.from(document.querySelectorAll(".py-3.space-y-6 div"))
-    FormListItem.map((item:any)=>({
-      status: item.querySelector("div").querySelectorAll("p")[0].innerText
-    }))
+    FormListItem.map((item:any)=>{
+      console.log(item.querySelector("div").querySelectorAll("p")[0].innerText);
+      
+    })
 
     return FormListItem
   })
@@ -22,8 +23,8 @@ const runPupp = async () => {
 }
 
 export default async function Home() {
-  const data = await runPupp()
-  console.log(data);
+  // const data = await runPupp()
+  // console.log(data);
   
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
